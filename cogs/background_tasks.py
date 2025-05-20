@@ -19,6 +19,7 @@ class BackgroundTasks(commands.Cog):
         await member.add_roles(self.auto_role)
 
 
+
 async def setup(bot):
     await bot.add_cog(BackgroundTasks(bot))
     print(f'Loaded cog: {BackgroundTasks.__name__}')
