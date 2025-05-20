@@ -2,11 +2,12 @@ import os
 
 import discord
 from discord.ext import commands
-from dotenv import load_dotenv
+from flask import Flask
 
-load_dotenv('.env')
+# from dotenv import load_dotenv
+#
+# load_dotenv('.env')
 guild_id = discord.Object(id=os.getenv('GUILD_ID'))
-
 
 class PrOrErClient(commands.Bot):
     def __init__(self):
