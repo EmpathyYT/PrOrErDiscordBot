@@ -1,15 +1,15 @@
+import asyncio
 import hashlib
 import hmac
 import os
 import threading
-
-from flask import Flask, request
-
+from quart import Quart, request
 from bot_main import PrOrErClient
 from dotenv import load_dotenv
 
 load_dotenv()
-
+port = int(os.environ.get("PORT", 10000))
+app = Quart(__name__)
 client = PrOrErClient()
 
 
@@ -26,11 +26,8 @@ def verify_signature(incoming):
     return hmac.compare_digest(mac.hexdigest(), signature)
 
 
-app = Flask(__name__)
-
-
-def run_bot():
-    client.run(os.getenv("TOKEN"))
+async def run_bot():
+    await client.start(os.getenv("TOKEN"))
 
 
 @app.route("/")
@@ -40,7 +37,7 @@ def index():
 
 @app.route('/github', methods=['POST'])
 async def github():
-    data = request.json
+    data = await request.json
     if not verify_signature(request):
         return "Invalid signature", 403
 
@@ -50,7 +47,11 @@ async def github():
 
     return "", 200
 
+async def main():
+    await asyncio.gather(
+        run_bot(),
+        app.run_task(host="0.0.0.0", port=port)
+    )
 
 if __name__ == "__main__":
-    threading.Thread(target=run_bot).start()
-    app.run(host="0.0.0.0", port=10000)
+    asyncio.run(main())
