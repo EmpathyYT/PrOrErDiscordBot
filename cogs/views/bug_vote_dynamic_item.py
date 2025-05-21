@@ -38,7 +38,7 @@ class BugVoteDynamicItem(
         return cls(user_id, message, user_ids, emoji)
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
-        if interaction.user.id == self.user_id:
+        if interaction.user.id != self.user_id:
             await interaction.response.send_message("You are not allowed to use this button.", ephemeral=True)
             return False
         return True
