@@ -5,8 +5,10 @@ from discord.ext import commands
 
 from dotenv import load_dotenv
 
+from cogs.views.bug_vote_dynamic_item import BugVoteDynamicItem
 from cogs.views.confirm_view import ConfirmView
 from cogs.views.download_button import GithubReleaseDownload
+from cogs.views.suggestion_vote_dynamic_item import SuggestionVoteDynamicItem
 
 load_dotenv()
 
@@ -26,9 +28,12 @@ class PrOrErClient(commands.Bot):
     async def setup_hook(self):
         await self.load_cogs()
         self.add_view(ConfirmView())
-        self.tree.copy_global_to(guild=guild_id)
-        await self.tree.sync(guild=guild_id)
-        await self.tree.sync()
+        self.add_dynamic_items(BugVoteDynamicItem)
+        self.add_dynamic_items(SuggestionVoteDynamicItem)
+        # self.tree.copy_global_to(guild=guild_id)
+        # self.tree.clear_commands(guild=guild_id)
+        # self.tree.clear_commands(guild=None)
+        await self.tree.sync(guild=None)
 
     async def on_ready(self):
         print(f'Logged in as {self.user}')

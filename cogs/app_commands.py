@@ -15,8 +15,8 @@ class AppCommands(commands.Cog):
     async def ping(self, interaction: discord.Interaction):
         await interaction.response.send_message('Pong!')
 
-    @discord.app_commands.command(name='bugreport', description='This is for reporting bugs')
-    async def bugreport(self, interaction: discord.Interaction):
+    @discord.app_commands.command(name='bug-report', description='This is for reporting bugs')
+    async def bug_report(self, interaction: discord.Interaction):
         await interaction.response.send_modal(BugFormModal(self.bot, feature_request_channel_id))
 
     @discord.app_commands.command(name='feature-request', description='This is for requesting features')

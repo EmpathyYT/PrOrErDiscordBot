@@ -3,6 +3,10 @@ import os
 import discord
 from discord import Interaction
 from dotenv import load_dotenv
+from enum import Enum
+
+from cogs.views.bug_vote_dynamic_item import BugVoteDynamicItem
+from cogs.views.suggestion_vote_dynamic_item import SuggestionVoteDynamicItem
 
 load_dotenv()
 
@@ -14,10 +18,13 @@ class ConfirmView(discord.ui.View):
     @discord.ui.button(label="Confirm", style=discord.ButtonStyle.green, custom_id='confirm_button')
     async def confirm(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.message.reply("Confirmed!")
-        channel_id = self.get_channel_to_send_to()
-
-        await interaction.guild.get_channel(channel_id.id).send(
-            embed=interaction.message.embeds[0],
+        channel = self.get_channel_to_send_to(interaction)
+        view, footer = self.get_appropriate_view(channel, interaction)
+        embed = interaction.message.embeds[0]
+        embed.set_footer(text=footer)
+        await interaction.guild.get_channel(channel.value.id).send(
+            embed=embed,
+            view=view,
         )
         self.stop()
 
@@ -32,8 +39,36 @@ class ConfirmView(discord.ui.View):
             return False
         return True
 
-    def get_channel_to_send_to(self):
-        if "Bug Report" in self.children[0].label:
-            return discord.Object(id=1374419412924371065)
+    def get_channel_to_send_to(self, interaction):
+        # return Channels.ALPHA_TESTER
+        if "Bug Report" in interaction.message.embeds[0].title:
+            return Channels.BUG_REPORT
         else:
-            return discord.Object(id=1374432042988732578)
+            return Channels.SUGGESTION
+
+    def get_appropriate_view(self, channel, interaction) -> (discord.ui.View, str):
+        view = discord.ui.View(timeout=None)
+        footer = ''
+        match channel:
+            case Channels.BUG_REPORT:
+                view.add_item(BugVoteDynamicItem(interaction.user.id, 'Report Bug',
+                                                 [str(interaction.user.id)], '🪲'))
+                footer = 'This bug has been reported by 1 person.'
+
+            case Channels.SUGGESTION:
+                view.add_item(SuggestionVoteDynamicItem(interaction.user.id, 'Suggest Feature',
+                                                        [str(interaction.user.id)], '⬆️'))
+                footer = 'This suggestion is requested by 1 person.'
+
+            case Channels.ALPHA_TESTER:
+                view.add_item(SuggestionVoteDynamicItem(interaction.user.id, 'Suggest Feature',
+                                                 [str(interaction.user.id)], '⬆️'))
+                footer = 'This suggestion is requested by 1 person.'
+
+        return view, footer
+
+
+class Channels(Enum):
+    BUG_REPORT = discord.Object(id=1374419412924371065)
+    SUGGESTION = discord.Object(id=1374432042988732578)
+    ALPHA_TESTER = discord.Object(id=1374399824392224909)
