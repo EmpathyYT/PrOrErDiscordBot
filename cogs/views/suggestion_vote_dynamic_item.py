@@ -32,8 +32,6 @@ class SuggestionVoteDynamicItem(
 
     @classmethod
     async def from_custom_id(cls, interaction: discord.Interaction, item: discord.ui.Button, match: re.Match[str], /):
-        log_message(f"{interaction.user.name} has interacted with feature suggest button\n"
-                    f"{interaction.message.embeds[0].description.split('\n')[0]}")
         user_ids_str = match.group("id")
         user_id = int(match.group("uid"))
         user_ids = user_ids_str.split(',') if user_ids_str else []
@@ -48,7 +46,8 @@ class SuggestionVoteDynamicItem(
         return True
 
     async def callback(self, interaction: discord.Interaction) -> None:
-
+        first_line = interaction.message.embeds[0].description.split('\n')[0]
+        log_message(f"{interaction.user.name} has interacted with feature suggest button\n{first_line}")
         if str(interaction.user.id) in self.users:
             self.users.remove(str(interaction.user.id))
             self.count -= 1
