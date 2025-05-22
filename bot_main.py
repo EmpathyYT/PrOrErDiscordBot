@@ -9,6 +9,7 @@ from cogs.views.bug_vote_dynamic_item import BugVoteDynamicItem
 from cogs.views.confirm_view import ConfirmView
 from cogs.views.download_button import GithubReleaseDownload
 from cogs.views.suggestion_vote_dynamic_item import SuggestionVoteDynamicItem
+from utils.bot_logging import setup_logging
 
 load_dotenv()
 
@@ -26,6 +27,7 @@ class PrOrErClient(commands.Bot):
         super().__init__(command_prefix='', intents=intents)
 
     async def setup_hook(self):
+        setup_logging()
         await self.load_cogs()
         self.add_view(ConfirmView())
         self.add_dynamic_items(BugVoteDynamicItem)

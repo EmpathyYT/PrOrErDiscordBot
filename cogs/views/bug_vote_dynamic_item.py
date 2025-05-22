@@ -4,6 +4,8 @@ import re
 import discord
 from discord.app_commands import private_channel_only
 
+from utils.bot_logging import log_message
+
 
 class BugVoteDynamicItem(
     discord.ui.DynamicItem[discord.ui.Button],
@@ -44,6 +46,8 @@ class BugVoteDynamicItem(
         return True
 
     async def callback(self, interaction: discord.Interaction) -> None:
+        log_message(f'{interaction.user.name} has interacted with bug report button\n '
+                    f'Message: {interaction.message.embeds[0].description}')
         if str(interaction.user.id) in self.users:
             self.users.remove(str(interaction.user.id))
             self.count -= 1

@@ -4,6 +4,8 @@ import re
 import discord
 from discord.app_commands import private_channel_only
 
+from utils.bot_logging import log_message
+
 
 class SuggestionVoteDynamicItem(
     discord.ui.DynamicItem[discord.ui.Button],
@@ -30,6 +32,8 @@ class SuggestionVoteDynamicItem(
 
     @classmethod
     async def from_custom_id(cls, interaction: discord.Interaction, item: discord.ui.Button, match: re.Match[str], /):
+        log_message(f'{interaction.user.name} has interacted with feature suggest button\n '
+                    f'Message: {interaction.message.embeds[0].description}')
         user_ids_str = match.group("id")
         user_id = int(match.group("uid"))
         user_ids = user_ids_str.split(',') if user_ids_str else []
@@ -44,6 +48,7 @@ class SuggestionVoteDynamicItem(
         return True
 
     async def callback(self, interaction: discord.Interaction) -> None:
+
         if str(interaction.user.id) in self.users:
             self.users.remove(str(interaction.user.id))
             self.count -= 1

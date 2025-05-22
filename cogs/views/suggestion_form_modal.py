@@ -17,8 +17,8 @@ class SuggestionFormModal(BaseModal):
     async def on_submit(self, interaction: discord.Interaction):
         await super().custom_on_submit(
             interaction.user,
-            f"Title: {self.children[0]}\n"
-            f"Description: {self.children[1]}\n"
+            f"**Title**: {self.children[0]}\n"
+            f"**Description**: {self.children[1]}\n"
         )
         await interaction.response.send_message(
             "Thank you for your request! We will look into it as soon as possible.",
@@ -28,3 +28,5 @@ class SuggestionFormModal(BaseModal):
     def build_ui(self):
         self.add_item(discord.ui.TextInput(label="Feature title", style=discord.TextStyle.short))
         self.add_item(discord.ui.TextInput(label="More detailed information", style=discord.TextStyle.long))
+
+

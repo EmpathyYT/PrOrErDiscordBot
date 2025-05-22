@@ -17,10 +17,10 @@ class BugFormModal(BaseModal):
     async def on_submit(self, interaction: discord.Interaction):
         await super().custom_on_submit(
             interaction.user,
-            f"Bug Description: {self.children[0]}\n"
-            f"Steps to Reproduce: {self.children[1]}\n"
-            f"Expected Result: {self.children[2]}\n"
-            f"Actual Result: {self.children[3]}"
+            f"**Bug Description**: {self.children[0]}\n"
+            f"**Steps to Reproduce**: {self.children[1]}\n"
+            f"**Expected Result**: {self.children[2]}\n"
+            f"**Actual Result**: {self.children[3]}"
         )
         await interaction.response.send_message(
             "Thank you for your report! We will look into it as soon as possible.",
