@@ -1,4 +1,5 @@
 import os
+import re
 
 import discord
 from discord import Interaction
@@ -12,8 +13,9 @@ load_dotenv()
 
 
 class ConfirmView(discord.ui.View):
-    def __init__(self):
+    def __init__(self, initial_user_id: int = None):
         super().__init__(timeout=None)
+        self.initial_user_id = initial_user_id
 
     @discord.ui.button(label="Confirm", style=discord.ButtonStyle.green, custom_id='confirm_button')
     async def confirm(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -48,21 +50,23 @@ class ConfirmView(discord.ui.View):
 
     def get_appropriate_view(self, channel, interaction) -> (discord.ui.View, str):
         view = discord.ui.View(timeout=None)
+        if self.initial_user_id is None:
+            self.initial_user_id = int(re.findall(r'\d+', interaction.message.content)[0])
         footer = ''
         match channel:
             case Channels.BUG_REPORT:
-                view.add_item(BugVoteDynamicItem(interaction.user.id, 'Report Bug',
-                                                 [str(interaction.user.id)], '🪲'))
+                view.add_item(BugVoteDynamicItem(self.initial_user_id, 'Report Bug',
+                                                 [str(self.initial_user_id)], '🪲'))
                 footer = 'This bug has been reported by 1 person.'
 
             case Channels.SUGGESTION:
-                view.add_item(SuggestionVoteDynamicItem(interaction.user.id, 'Suggest Feature',
-                                                        [str(interaction.user.id)], '⬆️'))
+                view.add_item(SuggestionVoteDynamicItem(self.initial_user_id, 'Suggest Feature',
+                                                        [str(self.initial_user_id)], '⬆️'))
                 footer = 'This suggestion is requested by 1 person.'
 
             case Channels.ALPHA_TESTER:
-                view.add_item(SuggestionVoteDynamicItem(interaction.user.id, 'Suggest Feature',
-                                                 [str(interaction.user.id)], '⬆️'))
+                view.add_item(SuggestionVoteDynamicItem(self.initial_user_id, 'Suggest Feature',
+                                                 [str(self.initial_user_id)], '⬆️'))
                 footer = 'This suggestion is requested by 1 person.'
 
         return view, footer

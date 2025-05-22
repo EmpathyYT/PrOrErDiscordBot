@@ -19,4 +19,5 @@ class BaseModal(discord.ui.Modal):
             description=modal_response,
             color=self.color
         )
-        await self.bot.get_channel(self.channel).send( f"Submittal by {user.mention}",embed=embed, view=ConfirmView())
+        await self.bot.get_channel(self.channel).send(f"Submittal by {user.mention}", embed=embed,
+                                                      view=ConfirmView(initial_user_id=user.id))
