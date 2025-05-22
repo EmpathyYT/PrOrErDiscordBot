@@ -13,7 +13,7 @@ app = Quart(__name__)
 client = PrOrErClient()
 
 
-def verify_signature(incoming):
+async def verify_signature(incoming):
     signature = incoming.headers.get('X-Hub-Signature-256')
     if signature is None:
         return False
@@ -22,7 +22,9 @@ def verify_signature(incoming):
     if sha_name != 'sha256':
         return False
 
-    mac = hmac.new(os.getenv("GITHUB_SECRET").encode(), msg=incoming.data, digestmod=hashlib.sha256)
+    data = await incoming.data
+
+    mac = hmac.new(os.getenv("GITHUB_SECRET").encode(), msg=data, digestmod=hashlib.sha256)
     return hmac.compare_digest(mac.hexdigest(), signature)
 
 
@@ -38,7 +40,7 @@ def index():
 @app.route('/github', methods=['POST'])
 async def github():
     data = await request.json
-    if not verify_signature(request):
+    if not await verify_signature(request):
         return "Invalid signature", 403
 
     event = request.headers.get('X-GitHub-Event')
