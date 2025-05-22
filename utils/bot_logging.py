@@ -8,3 +8,4 @@ def setup_logging():
 
 def log_message(message):
     logger.info(message)
+    print(message)
