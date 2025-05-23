@@ -38,6 +38,7 @@ class PrOrErClient(commands.Bot):
 
     async def setup_hook(self):
         setup_logging()
+
         await self.load_cogs()
         self.add_view(ConfirmView())
         self.add_dynamic_items(BugVoteDynamicItem)
