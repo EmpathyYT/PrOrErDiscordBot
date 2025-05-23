@@ -14,6 +14,7 @@ from utils.bot_logging import setup_logging
 
 load_dotenv()
 
+testing_channel_id = discord.Object(id=1374399824392224909)
 updates_channel_id = discord.Object(id=1367019660142448674)
 guild_id = discord.Object(id=os.getenv('GUILD_ID'))
 app_tester_role_id = discord.Object(id=1373542685243080704)
@@ -54,7 +55,7 @@ class PrOrErClient(commands.Bot):
                 await self.load_extension(f'{self.cogs_to_load}.{filename[:-3]}')
 
     async def on_github_hook(self, data):
-        await asyncio.sleep(480) # sleep for 8 minutes to allow for the build to finish
+        await asyncio.sleep(7 * 60) # sleep for 8 minutes to allow for the build to finish
         release = data['release']
         release_tag = release['tag_name']
         author = data['repository']['owner']['login']
@@ -69,5 +70,6 @@ class PrOrErClient(commands.Bot):
                               color=discord.Color.blurple())
         embed.set_footer(text=f"Authored by {author}\n"
                               f"Press the button below to download the new alpha release of PrOrEr.")
-        channel = self.get_channel(updates_channel_id.id)
-        await channel.send(f'<@&{app_tester_role_id.id}> ', embed=embed, view=GithubReleaseDownload(link=download))
+        channel = self.get_channel(testing_channel_id.id)
+        await channel.send(f'< ', embed=embed, view=GithubReleaseDownload(link=download))
+# @&{app_tester_role_id.id}>

@@ -40,19 +40,20 @@ def index():
 @app.route('/github', methods=['POST'])
 async def github():
     data = await request.json
-    if not await verify_signature(request):
-        return "Invalid signature", 403
+    # if not await verify_signature(request):
+    #     return "Invalid signature", 403
 
     event = request.headers.get('X-GitHub-Event')
-    if event == 'release':
+    if event == 'release' and data['action'] == 'prereleased':
         asyncio.create_task(client.on_github_hook(data))
+        return "", 200
 
-    return "", 200
+    return "Event not handled", 400
 
 async def main():
     await asyncio.gather(
         run_bot(),
-        app.run_task(host="0.0.0.0", port=port)
+        app.run_task(port=port)
     )
 #todo create roles for the feature request and bug report and ping them
 if __name__ == "__main__":
