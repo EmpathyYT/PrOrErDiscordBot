@@ -18,6 +18,13 @@ guild_id = discord.Object(id=os.getenv('GUILD_ID'))
 app_tester_role_id = discord.Object(id=1373542685243080704)
 
 
+def download_link_builder(data, tag) -> str:
+    repository = data['repository']['name']
+    file_name = data['release']['assets'][0]['name']
+    return \
+        f'https://github.com/{repository}/releases/download/{tag}/{file_name}'
+
+
 class PrOrErClient(commands.Bot):
     def __init__(self):
         self.cogs_to_load = "cogs"
@@ -48,14 +55,11 @@ class PrOrErClient(commands.Bot):
     async def on_github_hook(self, data):
         release = data['release']
         release_tag = release['tag_name']
-        author = release['author']['login']
+        author = data['repository']['owner']['login']
         release_body = release['body']
-        assets = release.get('assets', [])
 
-        if not assets:
-            return
+        download = download_link_builder(data, release_tag)
 
-        download = release['assets'][0]['browser_download_url']
         embed = discord.Embed(title=f"New Alpha Release",
                               description=
                               f'\n\n**Change Log**: {release_body[:3000]}'
