@@ -20,7 +20,7 @@ app_tester_role_id = discord.Object(id=1373542685243080704)
 
 
 def download_link_builder(data, tag) -> str:
-    repository = data['repository']['name']
+    repository = data['repository']['full_name']
     file_name = data['release']['assets'][0]['name']
     return \
         f'https://github.com/{repository}/releases/download/{tag}/{file_name}'
