@@ -2,3 +2,4 @@ discord.py
 python-dotenv~=1.1.0
 Quart~=0.20.0
 hypercorn
+PyGithub

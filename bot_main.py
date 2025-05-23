@@ -5,6 +5,7 @@ import discord
 from discord.ext import commands
 
 from dotenv import load_dotenv
+from github import Github
 
 from cogs.views.bug_vote_dynamic_item import BugVoteDynamicItem
 from cogs.views.confirm_view import ConfirmView
@@ -20,9 +21,8 @@ guild_id = discord.Object(id=os.getenv('GUILD_ID'))
 app_tester_role_id = discord.Object(id=1373542685243080704)
 
 
-def download_link_builder(data, tag) -> str:
+def download_link_builder(data, tag, file_name) -> str:
     repository = data['repository']['full_name']
-    file_name = data['release']['assets'][0]['name']
     return \
         f'https://github.com/{repository}/releases/download/{tag}/{file_name}'
 
@@ -30,6 +30,7 @@ def download_link_builder(data, tag) -> str:
 class PrOrErClient(commands.Bot):
     def __init__(self):
         self.cogs_to_load = "cogs"
+        self.github = Github(os.getenv('GITHUB_TOKEN')).get_repo("EmpathyYT/GymTracker")
         intents = discord.Intents.default()
         intents.members = True
         intents.message_content = True
@@ -55,12 +56,14 @@ class PrOrErClient(commands.Bot):
                 await self.load_extension(f'{self.cogs_to_load}.{filename[:-3]}')
 
     async def on_github_hook(self, data):
+        await asyncio.sleep(60)
+
         release = data['release']
         release_tag = release['tag_name']
         author = data['repository']['owner']['login']
         release_body = release['body']
-
-        download = download_link_builder(data, release_tag)
+        file_name = await self.get_release(release_tag)
+        download = download_link_builder(data, release_tag, file_name)
 
         embed = discord.Embed(title=f"New Alpha Release",
                               description=
@@ -72,3 +75,11 @@ class PrOrErClient(commands.Bot):
         channel = self.get_channel(testing_channel_id.id)
         await channel.send(f'< ', embed=embed, view=GithubReleaseDownload(link=download))
 # @&{app_tester_role_id.id}>
+
+    async def get_release(self, tag):
+        releases = self.github.get_release(tag)
+        for asset in releases.get_assets():
+            if asset.name.endswith('.apk'):
+                return asset.name
+
+        return None
