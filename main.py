@@ -45,7 +45,7 @@ async def github():
 
     event = request.headers.get('X-GitHub-Event')
     if event == 'release':
-        await client.on_github_hook(data)
+        asyncio.create_task(client.on_github_hook(data))
 
     return "", 200
 
