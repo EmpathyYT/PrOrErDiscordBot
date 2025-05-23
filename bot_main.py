@@ -1,3 +1,4 @@
+import asyncio
 import os
 
 import discord
@@ -53,6 +54,7 @@ class PrOrErClient(commands.Bot):
                 await self.load_extension(f'{self.cogs_to_load}.{filename[:-3]}')
 
     async def on_github_hook(self, data):
+        await asyncio.sleep(480) # sleep for 8 minutes to allow for the build to finish
         release = data['release']
         release_tag = release['tag_name']
         author = data['repository']['owner']['login']
