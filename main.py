@@ -53,7 +53,7 @@ async def github():
 async def main():
     await asyncio.gather(
         run_bot(),
-        app.run_task(port=port)
+        app.run_task(host='0.0.0.0',port=port)
     )
 #todo create roles for the feature request and bug report and ping them
 if __name__ == "__main__":
