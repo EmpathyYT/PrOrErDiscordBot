@@ -44,10 +44,11 @@ async def github():
         return "Invalid signature", 403
 
     event = request.headers.get('X-GitHub-Event')
-    if event == 'release':
+    if event == 'release' and data['action'] == 'prereleased':
         asyncio.create_task(client.on_github_hook(data))
+        return "", 200
 
-    return "", 200
+    return "Event not handled", 400
 
 async def main():
     await asyncio.gather(
