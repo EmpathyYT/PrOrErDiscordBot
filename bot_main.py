@@ -7,10 +7,10 @@ from discord.ext import commands
 from dotenv import load_dotenv
 from github import Github
 
-from cogs.views.bug_vote_dynamic_item import BugVoteDynamicItem
 from cogs.views.confirm_view import ConfirmView
 from cogs.views.download_button import GithubReleaseDownload
-from cogs.views.suggestion_vote_dynamic_item import SuggestionVoteDynamicItem
+
+from cogs.views.vote_button import VoteButton
 from utils.bot_logging import setup_logging
 
 load_dotenv()
@@ -26,7 +26,6 @@ def download_link_builder(data, tag, file_name) -> str:
         f'https://github.com/{repository}/releases/download/{tag}/{file_name}'
 
 
-
 class PrOrErClient(commands.Bot):
     def __init__(self):
         self.cogs_to_load = "cogs"
@@ -40,8 +39,7 @@ class PrOrErClient(commands.Bot):
         setup_logging()
         await self.load_cogs()
         self.add_view(ConfirmView())
-        self.add_dynamic_items(BugVoteDynamicItem)
-        self.add_dynamic_items(SuggestionVoteDynamicItem)
+        self.add_dynamic_items(VoteButton)
         # self.tree.copy_global_to(guild=guild_id)
         # self.tree.clear_commands(guild=guild_id)
         # self.tree.clear_commands(guild=None)
@@ -74,7 +72,6 @@ class PrOrErClient(commands.Bot):
                               f"Press the button below to download the new alpha release of PrOrEr.")
         channel = self.get_channel(updates_channel_id.id)
         await channel.send(f'<@&{app_tester_role_id.id}> ', embed=embed, view=GithubReleaseDownload(link=download))
-
 
     async def get_release(self, tag):
         releases = self.github.get_release(tag)
