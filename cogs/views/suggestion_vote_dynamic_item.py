@@ -33,7 +33,7 @@ class SuggestionVoteDynamicItem(
 
     @property
     def style(self) -> discord.ButtonStyle:
-        return discord.ButtonStyle.green
+        return discord.ButtonStyle.green #
 
     @classmethod
     async def from_custom_id(cls, interaction: discord.Interaction, item: discord.ui.Button, match: re.Match[str], /):
