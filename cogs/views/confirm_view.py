@@ -1,6 +1,5 @@
 import os
 import re
-from collections.abc import Callable, Coroutine
 from typing import Tuple
 
 import discord
@@ -8,9 +7,7 @@ from discord import Interaction
 from dotenv import load_dotenv
 from enum import Enum
 
-from DB.sqlite_service_provider import SQLiteServiceProvider
 from cogs.views.vote_button import VoteButton
-from constants import db_path
 
 load_dotenv()
 

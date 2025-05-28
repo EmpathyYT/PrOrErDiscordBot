@@ -7,6 +7,9 @@ class SQLiteServiceProvider(DBServiceProvider):
         super().__init__(self)
         self.db_path = db_path
 
+    async def initialize(self):
+        pass
+
     async def execute_query(self, query, params=None):
         async with aiosqlite.connect(self.db_path) as conn:
             if params:

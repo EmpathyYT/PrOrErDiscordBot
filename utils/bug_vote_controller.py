@@ -1,6 +1,6 @@
 import discord
 
-from DB.vote_controller import VoteController
+from utils.vote_controller import VoteController
 from utils.bot_logging import log_message
 
 

@@ -1,6 +1,6 @@
 import discord
 
-from DB.vote_controller import VoteController
+from utils.vote_controller import VoteController
 from utils.bot_logging import log_message
 
 
@@ -9,7 +9,7 @@ class SuggestionVoteController(VoteController):
         super().__init__(owner_id, '⬆️', 'Suggest Feature')
 
     def log_user_vote(self, user, title):
-        log_message(f"{user.name} has interacted with suggestion feature button\nTitle:{title}")
+        log_message(f"{user.name} has interacted with suggestion feature button\n{title}")
 
     async def add_user_vote(self, message_id, user_id):
         await self.db_provider.add_feature_user(message_id, user_id)

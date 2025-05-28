@@ -1,7 +1,5 @@
 from discord import User
-
-from DB.sqlite_service_provider import SQLiteServiceProvider
-from constants import db_path
+import bot_main
 
 
 class VoteController:
@@ -9,7 +7,7 @@ class VoteController:
         self.owner_id = owner_id
         self.emoji = emoji
         self.title = title
-        self.db_provider = SQLiteServiceProvider(db_path)
+        self.db_provider = bot_main.PrOrErClient.provider
 
     def log_user_vote(self, user: User, title) -> str:
         pass

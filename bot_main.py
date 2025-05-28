@@ -7,6 +7,8 @@ from discord.ext import commands
 from dotenv import load_dotenv
 from github import Github
 
+from DB.database_service_controller import DBServiceController
+from DB.supabase_service_provider import SupabaseServiceProvider
 from cogs.views.confirm_view import ConfirmView
 from cogs.views.download_button import GithubReleaseDownload
 
@@ -25,8 +27,8 @@ def download_link_builder(data, tag, file_name) -> str:
     return \
         f'https://github.com/{repository}/releases/download/{tag}/{file_name}'
 
-
 class PrOrErClient(commands.Bot):
+    provider: DBServiceController = DBServiceController(provider=SupabaseServiceProvider())
     def __init__(self):
         self.cogs_to_load = "cogs"
         intents = discord.Intents.default()
@@ -38,6 +40,7 @@ class PrOrErClient(commands.Bot):
     async def setup_hook(self):
         setup_logging()
         await self.load_cogs()
+        await self.provider.initialize()
         self.add_view(ConfirmView())
         self.add_dynamic_items(VoteButton)
         # self.tree.copy_global_to(guild=guild_id)

@@ -2,10 +2,10 @@ import re
 
 import discord
 
-from DB.bug_vote_controller import BugVoteController
+from utils.bug_vote_controller import BugVoteController
 
-from DB.suggestion_vote_controller import SuggestionVoteController
-from DB.vote_controller import VoteController
+from utils.suggestion_vote_controller import SuggestionVoteController
+from utils.vote_controller import VoteController
 
 
 class VoteButton(
@@ -47,7 +47,8 @@ class VoteButton(
         return True
 
     async def callback(self, interaction: discord.Interaction) -> None:
-        self.controller.log_user_vote(interaction.user, interaction.message.embeds[0].title)
+        submittal_title = interaction.message.embeds[0].description.split('\n')[0].strip()
+        self.controller.log_user_vote(interaction.user, submittal_title)
         await self.populate_vals_if_empty(interaction.message.id)
         if interaction.user.id in self.users:
             self.users.remove(interaction.user.id)

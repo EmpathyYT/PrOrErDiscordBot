@@ -1,6 +1,9 @@
 class DBServiceProvider:
-    def __init__(self, db_path):
+    def __init__(self, db_path = None):
         self.db_path = db_path
+
+    async def initialize(self):
+        pass
 
     async def add_bug_user(self, message_id, user_id):
         pass
