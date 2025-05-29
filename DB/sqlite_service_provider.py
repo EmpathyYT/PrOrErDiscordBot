@@ -28,30 +28,30 @@ class SQLiteServiceProvider(DBServiceProvider):
             async with conn.execute(query, params or ()) as cursor:
                 return await cursor.fetchone()
 
-    async def add_bug_user(self, message_id, user_id):
+    async def add_bug_user(self, report_id, user_id):
         query = "INSERT INTO bug_users (message_id, user_id) VALUES (?, ?)"
-        await self.execute_query(query, (message_id, user_id))
+        await self.execute_query(query, (report_id, user_id))
 
-    async def remove_bug_user(self, message_id, user_id):
+    async def remove_bug_user(self, report_id, user_id):
         query = "DELETE FROM bug_users WHERE message_id = ? AND user_id = ?"
-        await self.execute_query(query, (message_id, user_id))
+        await self.execute_query(query, (report_id, user_id))
 
-    async def get_bug_users(self, message_id) -> list[int]:
+    async def get_bug_users(self, report_id) -> list[int]:
         query = "SELECT user_id FROM bug_users WHERE message_id = ?"
-        rows = await self.fetch_all(query, (message_id,))
+        rows = await self.fetch_all(query, (report_id,))
         rows = [int(row[0]) for row in rows]
         return rows
 
-    async def add_feature_user(self, message_id, user_id):
+    async def add_feature_user(self, report_id, user_id):
         query = "INSERT INTO suggestion_users (message_id, user_id) VALUES (?, ?)"
-        await self.execute_query(query, (message_id, user_id))
+        await self.execute_query(query, (report_id, user_id))
 
-    async def remove_feature_user(self, message_id, user_id):
+    async def remove_feature_user(self, report_id, user_id):
         query = "DELETE FROM suggestion_users WHERE message_id = ? AND user_id = ?"
-        await self.execute_query(query, (message_id, user_id))
+        await self.execute_query(query, (report_id, user_id))
 
-    async def get_feature_users(self, message_id):
+    async def get_feature_users(self, report_id):
         query = "SELECT user_id FROM suggestion_users WHERE message_id = ?"
-        rows = await self.fetch_all(query, (message_id,))
+        rows = await self.fetch_all(query, (report_id,))
         rows = [int(row[0]) for row in rows]
         return rows

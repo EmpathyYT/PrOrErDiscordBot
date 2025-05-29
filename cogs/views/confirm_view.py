@@ -21,14 +21,14 @@ class ConfirmView(discord.ui.View):
     async def confirm(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.message.reply("Confirmed!")
         channel = get_channel_to_send_to(interaction)
-        view, footer, vote_item = await self.get_appropriate_view(channel, interaction)
         embed = interaction.message.embeds[0]
-        embed.set_footer(text=footer)
         message = await interaction.guild.get_channel(channel.value.id).send(
             embed=embed,
-            view=view,
         )
-        await vote_item.initialize(message.id, self.initial_user_id)
+        view, footer, report_id = await self.initialize_view(channel, interaction, message.id)
+        embed.set_footer(text=footer)
+        embed.title += f" #{report_id}"
+        await message.edit(embed=embed, view=view)
         self.stop()
 
     @discord.ui.button(label="Cancel", style=discord.ButtonStyle.red, custom_id='cancel_button')
@@ -42,9 +42,10 @@ class ConfirmView(discord.ui.View):
             return False
         return True
 
-    async def get_appropriate_view(self, channel, interaction) -> Tuple[discord.ui.View, str, VoteButton]:
+    async def initialize_view(self, channel, interaction, message_id) -> Tuple[discord.ui.View, str, int]:
         view = discord.ui.View(timeout=None)
         button: VoteButton | None = None
+        report_id: int | None = None
         if self.initial_user_id is None:
             self.initial_user_id = int(re.findall(r'\d+', interaction.message.content)[0])
 
@@ -52,16 +53,16 @@ class ConfirmView(discord.ui.View):
 
         match channel:
             case Channels.BUG_REPORT:
-                button = VoteButton(*initial_params, 0)
+                button, report_id = await VoteButton.initialize(*initial_params, 0, message_id)
 
             case Channels.SUGGESTION:
-                button = VoteButton(*initial_params, 1)
+                button, report_id = await VoteButton.initialize(*initial_params, 1, message_id)
 
             case Channels.ALPHA_TESTER:
-                button = VoteButton(*initial_params, 1)
+                button, report_id = await VoteButton.initialize(*initial_params, 1, message_id)
 
         view.add_item(button)
-        return view, button.get_message(), button
+        return view, button.get_message(), report_id
 
 
 class Channels(Enum):

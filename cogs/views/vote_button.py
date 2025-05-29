@@ -1,4 +1,5 @@
 import re
+from typing import Tuple, Self
 
 import discord
 
@@ -12,10 +13,10 @@ class VoteButton(
     discord.ui.DynamicItem[discord.ui.Button],
     template=r'user:(?P<uid>[0-9]+):type:(?P<type>[0-9]+)',
 ):
-    def __init__(self, owner_id: int, users: list, vote_type: int):
+    def __init__(self, owner_id: int, users: list, vote_type: int, report_id: int):
         self.users, self.owner_id, self.count = users, owner_id, len(users)
         self.controller = resolve_type(owner_id, vote_type)
-
+        self.report_id = report_id
         super().__init__(
             discord.ui.Button(
                 label=self.controller.get_title(),
@@ -34,11 +35,16 @@ class VoteButton(
         owner_id = int(match.group("uid"))
         vote_type = int(match.group("type"))
         controller = resolve_type(owner_id, vote_type)
-        user_ids = await controller.get_user_votes(interaction.message.id)
-        return cls(owner_id, user_ids, vote_type)
+        report_id = interaction.message.embeds[0].title.split('#')[-1].strip()
+        user_ids = await controller.get_user_votes(report_id)
+        return cls(owner_id, user_ids, vote_type, report_id)
 
-    async def initialize(self, message_id: int, owner_id: int, ):
-        await self.controller.add_user_vote(message_id, owner_id)
+    @classmethod
+    async def initialize(cls, owner_id, users, vote_type, message_id: int) -> Tuple[Self, int]:
+        controller = resolve_type(owner_id, vote_type)
+        report_id = await controller.initialize(message_id)
+        view = cls(owner_id, users, vote_type, report_id)
+        return view, report_id
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         if interaction.user.id == self.owner_id:
@@ -49,14 +55,14 @@ class VoteButton(
     async def callback(self, interaction: discord.Interaction) -> None:
         submittal_title = interaction.message.embeds[0].description.split('\n')[0].strip()
         self.controller.log_user_vote(interaction.user, submittal_title)
-        await self.populate_vals_if_empty(interaction.message.id)
+        await self.populate_vals_if_empty(self.report_id)
         if interaction.user.id in self.users:
             self.users.remove(interaction.user.id)
-            await self.controller.remove_user_vote(interaction.message.id, interaction.user.id)
+            await self.controller.remove_user_vote(self.report_id, interaction.user.id)
             self.count -= 1
         else:
             self.users.append(interaction.user.id)
-            await self.controller.add_user_vote(interaction.message.id, interaction.user.id)
+            await self.controller.add_user_vote(self.report_id, interaction.user.id)
             self.count += 1
 
         message = self.get_message()
@@ -68,9 +74,9 @@ class VoteButton(
     def get_message(self) -> str:
         return self.controller.message_gen(self.count)
 
-    async def populate_vals_if_empty(self, message_id: int) -> None:
+    async def populate_vals_if_empty(self, report_id: int) -> None:
         if len(self.users) == 0:
-            self.users = await self.controller.get_user_votes(message_id)
+            self.users = await self.controller.get_user_votes(report_id)
             self.count = len(self.users)
 
 

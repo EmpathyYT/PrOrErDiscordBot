@@ -1,6 +1,10 @@
 bug_users_table = 'BugUsers'
+bug_reports_table = 'BugReports'
+feature_requests_table = 'SuggestionReports'
 feature_users_table = 'SuggestionUsers'
 id_field_name = 'id'
+bug_report_id_field_name = 'bug_report_id'
+feature_request_id_field_name = 'suggestion_id'
 message_id_field_name = 'message_id'
 user_id_field_name = 'user_id'
 submittal_confirmation_channel = 1374477393800073337
