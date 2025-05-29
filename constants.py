@@ -6,6 +6,7 @@ id_field_name = 'id'
 bug_report_id_field_name = 'bug_report_id'
 feature_request_id_field_name = 'suggestion_id'
 message_id_field_name = 'message_id'
+created_at_field_name = 'created_at'
 user_id_field_name = 'user_id'
 submittal_confirmation_channel = 1374477393800073337
 bug_report_channel = 1374419412924371065

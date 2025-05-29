@@ -31,11 +31,12 @@ class AppCommands(commands.Cog):
     async def resolve_bug(self, interaction: discord.Interaction, report_id: str):
         report_id = int(report_id)
         report = await PrOrErClient.provider.get_bug_report(report_id)
+
         if report is None:
             await interaction.response.send_message("No bug report found with that ID.", ephemeral=True)
             return
 
-        message_id = report[message_id_field_name]
+        message_id = report.message_id
         message: discord.Message = await self.bot.get_channel(bug_report_channel).fetch_message(message_id)
         embed: discord.Embed = message.embeds[0]
         embed.colour = discord.Color.green()

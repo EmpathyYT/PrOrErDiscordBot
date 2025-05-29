@@ -6,6 +6,7 @@ from supabase._async.client import AsyncClient as Client, create_client
 from DB.database_service_provider import DBServiceProvider
 from constants import bug_users_table, message_id_field_name, user_id_field_name, feature_users_table, id_field_name, \
     bug_report_id_field_name, feature_request_id_field_name, bug_reports_table, feature_requests_table
+from models.submittal_object import SubmittalObject
 
 load_dotenv()
 
@@ -73,8 +74,8 @@ class SupabaseServiceProvider(DBServiceProvider):
 
     async def get_bug_report(self, report_id):
         response = await self.client.from_(bug_reports_table).select().eq(id_field_name, report_id).execute()
-        return response.data[0] if response.data else None
+        return SubmittalObject.from_dict(response.data[0]) if response.data else None
 
     async def get_feature_request(self, report_id):
         response = await self.client.from_(feature_requests_table).select().eq(id_field_name, report_id).execute()
-        return response.data[0] if response.data else None
+        return SubmittalObject.from_dict(response.data[0]) if response.data else None

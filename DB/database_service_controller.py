@@ -1,4 +1,5 @@
 from DB.database_service_provider import DBServiceProvider
+from models.submittal_object import SubmittalObject
 
 
 class DBServiceController(DBServiceProvider):
@@ -34,8 +35,8 @@ class DBServiceController(DBServiceProvider):
     async def create_feature_request(self, message_id):
         return await self.provider.create_feature_request(message_id)
 
-    async def get_bug_report(self, report_id):
+    async def get_bug_report(self, report_id) -> SubmittalObject | None:
         return await self.provider.get_bug_report(report_id)
 
-    async def get_feature_request(self, report_id):
+    async def get_feature_request(self, report_id) -> SubmittalObject | None:
         return await self.provider.get_feature_request(report_id)
