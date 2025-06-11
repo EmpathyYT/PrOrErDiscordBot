@@ -25,7 +25,7 @@ class VoteButton(
                 emoji=self.controller.get_emoji(),
             )
         )
-
+    
     @property
     def style(self) -> discord.ButtonStyle:
         return self.controller.get_style()

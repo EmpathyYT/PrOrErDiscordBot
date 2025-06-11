@@ -46,7 +46,7 @@ class PrOrErClient(commands.Bot):
         # self.tree.copy_global_to(guild=guild_id)
         # self.tree.clear_commands(guild=guild_id)
         # self.tree.clear_commands(guild=None)
-        await self.tree.sync(guild=None)
+        # await self.tree.sync(guild=None)
 
     async def on_ready(self):
         print(f'Logged in as {self.user}')
