@@ -17,9 +17,10 @@ from utils.bot_logging import setup_logging
 
 load_dotenv()
 
-updates_channel_id = discord.Object(id=1367019660142448674)
-guild_id = discord.Object(id=os.getenv('GUILD_ID'))
-app_tester_role_id = discord.Object(id=1373542685243080704)
+version_tracker_channel = discord.Object(id=1384565719953571892)
+updates_channel = discord.Object(id=1367019660142448674)
+guild = discord.Object(id=os.getenv('GUILD_ID'))
+app_tester_role = discord.Object(id=1373542685243080704)
 
 
 def download_link_builder(data, tag, file_name) -> str:
@@ -27,8 +28,10 @@ def download_link_builder(data, tag, file_name) -> str:
     return \
         f'https://github.com/{repository}/releases/download/{tag}/{file_name}'
 
+
 class PrOrErClient(commands.Bot):
     provider: DBServiceController = DBServiceController(provider=SupabaseServiceProvider())
+
     def __init__(self):
         self.cogs_to_load = "cogs"
         intents = discord.Intents.default()
@@ -73,13 +76,16 @@ class PrOrErClient(commands.Bot):
                               color=discord.Color.blurple())
         embed.set_footer(text=f"Authored by {author}\n"
                               f"Press the button below to download the new alpha release of PrOrEr.")
-        channel = self.get_channel(updates_channel_id.id)
-        await channel.send(f'<@&{app_tester_role_id.id}> ', embed=embed, view=GithubReleaseDownload(link=download))
+        channel = self.get_channel(updates_channel.id)
+        version_tracker = self.get_channel(version_tracker_channel.id)
+        await channel.send(f'<@&{app_tester_role.id}> ', embed=embed, view=GithubReleaseDownload(link=download))
+        await version_tracker.edit(name=f'Latest Version: {release_tag}')
 
-    async def get_release(self, tag):
-        releases = self.github.get_release(tag)
-        for asset in releases.get_assets():
-            if asset.name.endswith('.apk'):
-                return asset.name
 
-        return None
+async def get_release(self, tag):
+    releases = self.github.get_release(tag)
+    for asset in releases.get_assets():
+        if asset.name.endswith('.apk'):
+            return asset.name
+
+    return None
