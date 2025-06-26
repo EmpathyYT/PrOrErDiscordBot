@@ -60,13 +60,13 @@ class PrOrErClient(commands.Bot):
                 await self.load_extension(f'{self.cogs_to_load}.{filename[:-3]}')
 
     async def on_github_hook(self, data):
+        await asyncio.sleep(60)
         release = data['release']
         release_tag = release['tag_name']
         author = data['repository']['owner']['login']
         release_body = release['body']
         file_name = await self.get_release(release_tag)
         download = download_link_builder(data, release_tag, file_name)
-
         embed = discord.Embed(title=f"New Alpha Release",
                               description=
                               f'\n\n**Change Log**: {release_body[:3000]}'
@@ -80,10 +80,10 @@ class PrOrErClient(commands.Bot):
         await version_tracker.edit(name=f'Latest Version: {release_tag}')
 
 
-async def get_release(self, tag):
-    releases = self.github.get_release(tag)
-    for asset in releases.get_assets():
-        if asset.name.endswith('.apk'):
-            return asset.name
+    async def get_release(self, tag):
+        releases = self.github.get_release(tag)
+        for asset in releases.get_assets():
+            if asset.name.endswith('.apk'):
+                return asset.name
 
-    return None
+        return None
