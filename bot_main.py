@@ -60,8 +60,6 @@ class PrOrErClient(commands.Bot):
                 await self.load_extension(f'{self.cogs_to_load}.{filename[:-3]}')
 
     async def on_github_hook(self, data):
-        await asyncio.sleep(60)
-
         release = data['release']
         release_tag = release['tag_name']
         author = data['repository']['owner']['login']
