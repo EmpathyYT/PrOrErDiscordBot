@@ -91,7 +91,7 @@ class AppCommands(commands.Cog):
             if suggestion_report is not None:
                 report_message, link, original_message = await self.get_report_title_and_link(False,
                                                                                               suggestion_report.message_id)
-                message_to_add = f"- [Feature Request: #{report_id}](<{link}>) {report_message}"
+                message_to_add = f"- [Feature Request #{report_id}](<{link}>): {report_message}"
                 await edit_to_do_original_item(original_message, True)
             else:
                 await interaction.response.send_message("Invalid Id", ephemeral=True)
