@@ -29,8 +29,8 @@ class DBServiceController(DBServiceProvider):
     async def get_feature_users(self, report_id):
         return await self.provider.get_feature_users(report_id)
 
-    async def create_bug_report(self, message_id):
-        return await self.provider.create_bug_report(message_id)
+    async def create_bug_report(self, message_id, is_closed_alpha=False):
+        return await self.provider.create_bug_report(message_id, is_closed_alpha)
 
     async def create_feature_request(self, message_id):
         return await self.provider.create_feature_request(message_id)

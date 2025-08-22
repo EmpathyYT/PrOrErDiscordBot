@@ -7,7 +7,10 @@ from discord import Interaction
 from dotenv import load_dotenv
 from enum import Enum
 
+import bot_main
 from cogs.views.vote_button import VoteButton
+from constants import is_testing
+from models.channel_model import ChannelModel
 
 load_dotenv()
 
@@ -20,12 +23,13 @@ class ConfirmView(discord.ui.View):
     @discord.ui.button(label="Confirm", style=discord.ButtonStyle.green, custom_id='confirm_button')
     async def confirm(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.message.reply("Confirmed!")
-        channel = get_channel_to_send_to(interaction)
+        channel_search_params = get_channel_to_send_to(interaction)
+        channel = bot_main.get_appropriate_channel(channel_search_params)
         embed = interaction.message.embeds[0]
-        message = await interaction.guild.get_channel(channel.value.id).send(
+        message = await interaction.guild.get_channel(channel.id).send(
             embed=embed,
         )
-        view, footer, report_id = await self.initialize_view(channel, interaction, message.id)
+        view, footer, report_id = await self.initialize_view(channel_search_params, interaction, message.id)
         embed.set_footer(text=footer)
         embed.title += f" #{report_id}"
         await message.edit(embed=embed, view=view)
@@ -51,15 +55,14 @@ class ConfirmView(discord.ui.View):
 
         initial_params = (self.initial_user_id, [self.initial_user_id])
 
-        match channel:
-            case Channels.BUG_REPORT:
-                button, report_id = await VoteButton.initialize(*initial_params, 0, message_id)
+        if channel.is_bug_report:
+            button, report_id = await VoteButton.initialize(*initial_params, 0, message_id)
 
-            case Channels.SUGGESTION:
-                button, report_id = await VoteButton.initialize(*initial_params, 1, message_id)
+        elif channel.is_suggestion:
+            button, report_id = await VoteButton.initialize(*initial_params, 1, message_id)
 
-            case Channels.ALPHA_TESTER:
-                button, report_id = await VoteButton.initialize(*initial_params, 1, message_id)
+        else:
+            button, report_id = await VoteButton.initialize(*initial_params, 2, message_id)
 
         view.add_item(button)
         return view, button.get_message(), report_id
@@ -71,9 +74,15 @@ class Channels(Enum):
     ALPHA_TESTER = discord.Object(id=1374399824392224909)
 
 
-def get_channel_to_send_to(interaction):
-    # return Channels.ALPHA_TESTER
-    if "Bug Report" in interaction.message.embeds[0].title:
-        return Channels.BUG_REPORT
+def get_channel_to_send_to(interaction) -> ChannelModel:
+    channel_resolve_params = ChannelModel(is_testing=is_testing)
+    message_title = interaction.message.embeds[0].title
+    if "Bug Report" in message_title:
+        if "Closed" in message_title:
+            channel_resolve_params.is_closed = True
+
+        channel_resolve_params.is_bug_report = True
+        return channel_resolve_params
     else:
-        return Channels.SUGGESTION
+        channel_resolve_params.is_suggestion = True
+        return channel_resolve_params

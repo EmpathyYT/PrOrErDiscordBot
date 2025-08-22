@@ -3,10 +3,10 @@ import discord
 from cogs.views.base_modal import BaseModal
 
 
-class BugFormModal(BaseModal):
+class ClosedTesterBugReportModal(BaseModal):
     def __init__(self, bot, channel):
         super().__init__(
-            title="New Open Alpha Bug Report Submittal",
+            title="New Closed Alpha Bug Report Submittal",
             description="Please fill out the form below to report a bug.",
             color=discord.Color.red(),
             channel=channel,
@@ -32,4 +32,3 @@ class BugFormModal(BaseModal):
         self.add_item(discord.ui.TextInput(label="Steps to Reproduce", style=discord.TextStyle.long))
         self.add_item(discord.ui.TextInput(label="Expected Result", style=discord.TextStyle.long))
         self.add_item(discord.ui.TextInput(label="Actual Result", style=discord.TextStyle.long))
-

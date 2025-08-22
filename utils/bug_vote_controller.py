@@ -10,7 +10,7 @@ class BugVoteController(VoteController):
 
     def log_user_vote(self, user, title):
         log_message(f"{user.name} has interacted with bug report button\n{title}")
-
+        
     async def add_user_vote(self, report_id, user_id):
         await self.db_provider.add_bug_user(report_id, user_id)
 

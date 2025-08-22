@@ -5,7 +5,8 @@ from supabase._async.client import AsyncClient as Client, create_client
 
 from DB.database_service_provider import DBServiceProvider
 from constants import bug_users_table, message_id_field_name, user_id_field_name, feature_users_table, id_field_name, \
-    bug_report_id_field_name, feature_request_id_field_name, bug_reports_table, feature_requests_table
+    bug_report_id_field_name, feature_request_id_field_name, bug_reports_table, feature_requests_table, \
+    closed_alpha_field_name
 from models.submittal_object import SubmittalObject
 
 load_dotenv()
@@ -58,16 +59,17 @@ class SupabaseServiceProvider(DBServiceProvider):
             report_id).execute()
         return [user[user_id_field_name] for user in response.data] if response.data else []
 
-    async def create_bug_report(self, message_id):
+    async def create_bug_report(self, message_id, is_closed_alpha=False):
         data = {
-            message_id_field_name: message_id
+            message_id_field_name: message_id,
+            closed_alpha_field_name: is_closed_alpha
         }
         data = await self.client.from_(bug_reports_table).insert(data).execute()
         return data.data[0][id_field_name] if data.data else None
 
     async def create_feature_request(self, message_id):
         data = {
-            message_id_field_name: message_id
+            message_id_field_name: message_id,
         }
         data = await self.client.from_(feature_requests_table).insert(data).execute()
         return data.data[0][id_field_name] if data.data else None

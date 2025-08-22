@@ -2,15 +2,16 @@ import asyncio
 import hashlib
 import hmac
 import os
-import threading
 from quart import Quart, request
 from bot_main import PrOrErClient
 from dotenv import load_dotenv
 
+from constants import is_testing
+
 load_dotenv()
 port = int(os.environ.get("PORT", 10000))
 app = Quart(__name__)
-client = PrOrErClient()
+client = PrOrErClient(is_testing=is_testing)
 
 
 async def verify_signature(incoming):
@@ -55,6 +56,6 @@ async def main():
         run_bot(),
         app.run_task(host="0.0.0.0", port=port)
     )
-#todo create roles for the feature request and bug report and ping them
+
 if __name__ == "__main__":
     asyncio.run(main())

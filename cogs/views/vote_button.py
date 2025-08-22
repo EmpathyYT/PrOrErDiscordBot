@@ -4,6 +4,7 @@ from typing import Tuple, Self
 import discord
 
 from utils.bug_vote_controller import BugVoteController
+from utils.closed_bug_vote_controller import ClosedAlphaBugVoteController
 
 from utils.suggestion_vote_controller import SuggestionVoteController
 from utils.vote_controller import VoteController
@@ -25,7 +26,7 @@ class VoteButton(
                 emoji=self.controller.get_emoji(),
             )
         )
-    
+
     @property
     def style(self) -> discord.ButtonStyle:
         return self.controller.get_style()
@@ -86,4 +87,7 @@ def resolve_type(owner_id, vote_type: int) -> VoteController | None:
             return BugVoteController(owner_id)
         case 1:
             return SuggestionVoteController(owner_id)
+        case 2:
+            return ClosedAlphaBugVoteController(owner_id)
+
     return None

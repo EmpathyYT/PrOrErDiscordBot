@@ -23,7 +23,7 @@ class DBServiceProvider:
     async def get_feature_users(self, report_id):
         pass
 
-    async def create_bug_report(self, message_id):
+    async def create_bug_report(self, message_id, is_closed_alpha):
         pass
 
     async def create_feature_request(self, message_id):
