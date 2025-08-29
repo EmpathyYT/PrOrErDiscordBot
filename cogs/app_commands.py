@@ -230,8 +230,8 @@ class AppCommands(commands.Cog):
 
     async def check_to_do_exists(self, suggestion_or_bug, report_id) -> tuple[bool, tuple[
         Message, list[str], list[str], Message]] | tuple[bool, tuple[Message, list[str]]]:
-        to_do_fetched_channel: TextChannel = self.bot.get_channel(to_do_channel.id)
-        to_do_message = (await to_do_fetched_channel.fetch_message(to_do_fetched_channel.last_message_id))
+        to_do_fetched_channel: TextChannel = await self.bot.fetch_channel(to_do_channel.id)
+        to_do_message = [message async for message in to_do_fetched_channel.history(limit=1)][0]
         to_do_message_content = to_do_message.content
         to_do_spliced_messages = to_do_message_content.split(to_do_seperator)
         if to_do_spliced_messages[0] == '\n':
