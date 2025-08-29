@@ -1,3 +1,4 @@
+import logging
 import os
 from random import choices
 
@@ -13,7 +14,7 @@ from constants import submittal_confirmation_channel, message_id_field_name, clo
     closed_bug_report_channel, open_bug_report_channel, app_dev_role, to_do_channel, to_do_seperator, guild, \
     feature_request_channel
 from models.channel_model import ChannelModel
-from typing import Tuple
+from typing import Tuple, Any, Coroutine
 
 
 async def edit_to_do_original_item(msg: Message, is_adding: bool = True):
@@ -67,8 +68,8 @@ class AppCommands(commands.Cog):
     @discord.app_commands.checks.has_role(app_dev_role.id)
     @discord.app_commands.choices(
         suggestion_or_bug=[
-            Choice(name="Suggestion", value="Suggestion"),
-            Choice(name="Bug Fix", value="Bug Fix")
+            Choice(name="Feature Request", value="Feature Request"),
+            Choice(name="Bug Report", value="Bug Report")
         ]
     )
     @discord.app_commands.command(name='add-to-do', description='This is for adding to server-to-do list')
@@ -80,13 +81,11 @@ class AppCommands(commands.Cog):
             await interaction.response.send_message("Item Already Exists", ephemeral=True)
             return
 
-        to_do_fetched_channel: TextChannel = self.bot.get_channel(to_do_channel.id)
-        to_do_message = (await to_do_fetched_channel.fetch_message(to_do_fetched_channel.last_message_id))
-        to_do_message_content = to_do_message.content
-        to_do_spliced_messages = to_do_message_content.split(to_do_seperator)
+        to_do_message = data[1][0]
+        to_do_spliced_messages = data[1][1]
         message_to_add: str
         original_message: Message
-        if suggestion_or_bug.value == "Suggestion":
+        if suggestion_or_bug.value == "Feature Request":
             suggestion_report = await PrOrErClient.provider.get_feature_request(report_id)
             if suggestion_report is not None:
                 report_message, link, original_message = await self.get_report_title_and_link(False,
@@ -118,8 +117,8 @@ class AppCommands(commands.Cog):
     @discord.app_commands.checks.has_role(app_dev_role.id)
     @discord.app_commands.choices(
         suggestion_or_bug=[
-            Choice(name="Suggestion", value="Suggestion"),
-            Choice(name="Bug Fix", value="Bug Fix")
+            Choice(name="Feature Request", value="Feature Request"),
+            Choice(name="Bug Report", value="Bug Report")
         ]
     )
     @discord.app_commands.command(name='remove-to-do', description='This is for removing from server-to-do list')
@@ -130,11 +129,11 @@ class AppCommands(commands.Cog):
             suggestion_or_bug,
             report_id
         )
-
-        to_do_message, to_do_spliced_messages, message_list, original_message = data
         if not exists:
             await interaction.response.send_message("Invalid Data", ephemeral=True)
             return
+
+        to_do_message, to_do_spliced_messages, message_list, original_message = data
 
         if len(message_list) == 1:
             to_do_spliced_messages[1] = f"\n"
@@ -144,7 +143,7 @@ class AppCommands(commands.Cog):
 
         new_message = to_do_seperator.join(to_do_spliced_messages)
         await to_do_message.edit(content=new_message)
-        if suggestion_or_bug.value == "Suggestion":
+        if suggestion_or_bug.value == "Feature Request":
             await edit_to_do_original_item(original_message, False)
 
         await interaction.response.send_message("Done!", ephemeral=True)
@@ -229,26 +228,27 @@ class AppCommands(commands.Cog):
         message = embed_to_extract_from.description.split('\n')[0].split(":")[1].strip()
         return message, link, original_message
 
-    async def check_to_do_exists(self, suggestion_or_bug, report_id) -> Tuple[bool, Tuple[
-                                                                                        discord.Message, list[str],
-                                                                                        list[str], Message] | None]:
+    async def check_to_do_exists(self, suggestion_or_bug, report_id) -> tuple[bool, tuple[
+        Message, list[str], list[str], Message]] | tuple[bool, tuple[Message, list[str]]]:
         to_do_fetched_channel: TextChannel = self.bot.get_channel(to_do_channel.id)
         to_do_message = (await to_do_fetched_channel.fetch_message(to_do_fetched_channel.last_message_id))
         to_do_message_content = to_do_message.content
         to_do_spliced_messages = to_do_message_content.split(to_do_seperator)
+        if to_do_spliced_messages[0] == '\n':
+            return False, (to_do_message, to_do_spliced_messages)
         message_list = to_do_spliced_messages[1][2:].split("\n")
         original_message: Message
         for message in message_list:
-            if suggestion_or_bug.value and str(report_id) in message:
+            if f"[{suggestion_or_bug.value} #{report_id}]" in message:
                 channel_model = ChannelModel(
-                    is_bug_report=True) if suggestion_or_bug.value == "Bug Fix" else ChannelModel(is_suggestion=True)
+                    is_bug_report=True) if suggestion_or_bug.value == "Bug Report" else ChannelModel(is_suggestion=True)
                 message_id = int(message.split("/")[-1].split(">")[0])
                 channel = (get_appropriate_channel(channel_model)).id
                 original_message = await self.bot.get_channel(channel).fetch_message(message_id)
                 message_list.remove(message)
                 return True, (to_do_message, to_do_spliced_messages, message_list, original_message)
 
-        return False, None
+        return False, (to_do_message, to_do_spliced_messages)
 
 
 async def setup(bot):
