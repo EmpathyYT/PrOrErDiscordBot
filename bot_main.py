@@ -96,5 +96,7 @@ class PrOrErClient(commands.Bot):
             get_appropriate_channel(ChannelModel(is_testing=self.testing, is_release=True, is_closed=is_closed)).id)
 
         version_tracker = self.get_channel(version_tracker_channel.id)
-        await channel.send(f'<@&{app_tester_role.id}> ', embed=embed, view=GithubReleaseDownload(link=download))
-        await version_tracker.edit(name=f'Latest Version: {release_tag}')
+        await channel.send(f'<@&{app_tester_role.id if not is_closed else closed_tester_role.id}> ', embed=embed,
+                           view=GithubReleaseDownload(link=download))
+        if not is_closed:
+            await version_tracker.edit(name=f'Latest Version: {release_tag}')
