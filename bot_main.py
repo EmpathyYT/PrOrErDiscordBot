@@ -97,8 +97,9 @@ class PrOrErClient(commands.Bot):
 
         version_tracker = self.get_channel(version_tracker_channel.id)
         if is_closed:
-            embed.description += "\n\n**Note:** This is a closed alpha release. Such releases could be highly unstable and may" \
-            "include features that are subject to removal or editing in future public releases."
+            embed.description += '\n\n**Note:** This is a closed alpha release. '\
+                                 'It may be highly unstable and could include features that might be removed or changed in future public releases.'
+
         await channel.send(f'<@&{app_tester_role.id if not is_closed else closed_tester_role.id}> ', embed=embed,
                    view=GithubReleaseDownload(link=download))
         if not is_closed:
