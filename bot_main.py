@@ -89,6 +89,10 @@ class PrOrErClient(commands.Bot):
         author = data['repository']['owner']['login']
         release_body = release['body']
         is_closed = "closed" in release_tag.lower()
+        if is_closed:
+            release_body += '\n\n**Note:** This is a closed alpha release. ' \
+                            'It may be highly unstable and could include features that might be removed or changed in future public releases.'
+
         download = download_link_builder(data, release_tag)
         embed = await generate_embed(author, release_body, release_tag)
 
@@ -96,11 +100,8 @@ class PrOrErClient(commands.Bot):
             get_appropriate_channel(ChannelModel(is_testing=self.testing, is_release=True, is_closed=is_closed)).id)
 
         version_tracker = self.get_channel(version_tracker_channel.id)
-        if is_closed:
-            embed.description += '\n\n**Note:** This is a closed alpha release. '\
-                                 'It may be highly unstable and could include features that might be removed or changed in future public releases.'
 
         await channel.send(f'<@&{app_tester_role.id if not is_closed else closed_tester_role.id}> ', embed=embed,
-                   view=GithubReleaseDownload(link=download))
+                           view=GithubReleaseDownload(link=download))
         if not is_closed:
             await version_tracker.edit(name=f'Latest Version: {release_tag}')
