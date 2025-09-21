@@ -41,7 +41,7 @@ async def generate_embed(author, release_body, release_tag: str):
     build_number = release_tag.split('alpha.')[1]
     embed = discord.Embed(title=f"New Alpha Release",
                           description=
-                          f'\n\n**Change Log**: {release_body[:3000]}'
+                          f'\n\n**Change Log**: {release_body[:3800]}'
                           f'\n**Version:** {release_tag}'
                           f'\n**Build:** {build_number}\n\n',
                           color=discord.Color.blurple())
