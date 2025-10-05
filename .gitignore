@@ -1,3 +1,5 @@
 .env
 /logs.log
 /.fleet/run.json
+.venv
+*.pyc

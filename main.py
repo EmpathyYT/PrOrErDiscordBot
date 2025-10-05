@@ -25,12 +25,12 @@ async def verify_signature(incoming):
 
     data = await incoming.data
 
-    mac = hmac.new(os.getenv("GITHUB_SECRET").encode(), msg=data, digestmod=hashlib.sha256)
+    mac = hmac.new(os.getenv("GITHUB_SECRET").encode(), msg=data, digestmod=hashlib.sha256) # type: ignore
     return hmac.compare_digest(mac.hexdigest(), signature)
 
 
 async def run_bot():
-    await client.start(os.getenv("TOKEN"))
+    await client.start(os.getenv("TOKEN")) # type: ignore
 
 
 @app.route("/")
@@ -50,6 +50,12 @@ async def github():
         return "", 200
 
     return "Event not handled", 400
+
+
+@app.route('/logs')
+async def logs():
+    lines = open("logs.log").readlines()
+    return "<br>".join(lines), 200
 
 async def main():
     await asyncio.gather(

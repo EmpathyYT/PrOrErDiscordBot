@@ -23,7 +23,7 @@ open_updates_channel = discord.Object(id=1367019660142448674)
 closed_updates_channel = discord.Object(id=1408122777722032158)
 open_bug_report_channel = discord.Object(id=1374419412924371065)
 closed_bug_report_channel = discord.Object(id=1408122828561191044)
-guild = discord.Object(id=os.getenv('GUILD_ID'))
+guild = discord.Object(id=os.getenv('GUILD_ID')) # type: ignore
 app_tester_role = discord.Object(id=1373542685243080704)
 closed_tester_role = discord.Object(id=1385713445248176168)
 app_dev_role = discord.Object(id=1373543360572162048)
