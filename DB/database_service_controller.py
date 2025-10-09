@@ -43,3 +43,12 @@ class DBServiceController(DBServiceProvider):
     
     async def add_version_to_app_db(self, version):
         await self.provider.add_version_to_app_db(version)
+
+    async def outdate_previous_versions(self, version):
+        await self.provider.outdate_previous_versions(version)
+
+    async def outdate_version(self, version):
+        await self.provider.outdate_version(version)
+
+    async def allow_version(self, version):
+        await self.provider.allow_version(version)

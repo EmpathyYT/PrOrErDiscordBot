@@ -38,3 +38,12 @@ class DBServiceProvider:
     async def add_version_to_app_db(self, version):
         pass
 
+    async def outdate_previous_versions(self, version):
+        pass
+
+    async def outdate_version(self, version):
+        pass
+
+    async def allow_version(self, version):
+        pass
+

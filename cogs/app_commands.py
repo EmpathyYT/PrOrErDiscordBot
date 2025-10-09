@@ -218,6 +218,27 @@ class AppCommands(commands.Cog):
         await PrOrErClient.provider.add_version_to_app_db(version)
         await interaction.response.send_message(f"Version {version} added to the database!", ephemeral=True)
     
+    @discord.app_commands.checks.has_role(app_dev_role.id)
+    @discord.app_commands.describe(report_id='This disallows all versions except the one provided')
+    async def outdate_all_versions(self, interaction: discord.Interaction, report_id: str):
+        version = report_id
+        await PrOrErClient.provider.outdate_previous_versions(version)
+        await interaction.response.send_message(f"All versions except {version} have been disallowed.", ephemeral=True)
+
+    @discord.app_commands.checks.has_role(app_dev_role.id)
+    @discord.app_commands.describe(report_id='This disallows a specific version')
+    async def outdate_version(self, interaction: discord.Interaction, report_id: str):
+        version = report_id
+        await PrOrErClient.provider.outdate_version(version)
+        await interaction.response.send_message(f"Version {version} has been disallowed.", ephemeral=True)
+
+    @discord.app_commands.checks.has_role(app_dev_role.id)
+    @discord.app_commands.describe(report_id='This allows a specific version')
+    async def allow_version(self, interaction: discord.Interaction, report_id: str):
+        version = report_id
+        await PrOrErClient.provider.allow_version(version)
+        await interaction.response.send_message(f"Version {version} has been allowed.", ephemeral=True)
+
     async def get_report_title_and_link(self, is_bug: bool, message_id: int) -> Tuple[str, str, Message]:
         embed_to_extract_from: discord.Embed
         original_message: discord.Message

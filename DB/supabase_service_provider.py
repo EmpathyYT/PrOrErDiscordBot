@@ -86,8 +86,17 @@ class SupabaseServiceProvider(DBServiceProvider):
     
     async def add_version_to_app_db(self, version):
         data = {
-            app_versions_field_name: version
+            app_versions_field_name: version,
+            outdated_field_name: False
         }
         await self.app_client.from_(app_versions_table).insert(data).execute()
 
+    async def outdate_previous_versions(self, version):
+        await self.app_client.from_(app_versions_table).update({outdated_field_name: True}).neq(app_versions_field_name, version).execute()
 
+    async def outdate_version(self, version):
+        await self.app_client.from_(app_versions_table).update({outdated_field_name: True}).eq(app_versions_field_name, version).execute()
+
+    async def allow_version(self, version):
+        await self.app_client.from_(app_versions_table).update({outdated_field_name: False}).eq(app_versions_field_name, version).execute()
+    
