@@ -9,13 +9,13 @@ class VoteController:
         self.title = title
         self.db_provider = bot_main.PrOrErClient.provider
 
-    def log_user_vote(self, user: User, title) -> str:
+    def log_user_vote(self, user: User, title):
         pass
 
     async def add_user_vote(self, report_id, user_id):
         pass
 
-    async def initialize(self, message_id: int) -> int:
+    async def initialize(self, message_id: int):
         pass
 
     async def remove_user_vote(self, report_id, user_id):
@@ -24,7 +24,7 @@ class VoteController:
     async def get_user_votes(self, report_id):
         pass
 
-    def message_gen(self, count) -> str:
+    def message_gen(self, count):
         pass
 
     def get_style(self):

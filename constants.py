@@ -15,6 +15,8 @@ message_id_field_name = 'message_id'
 created_at_field_name = 'created_at'
 closed_alpha_field_name = 'closed_alpha'
 user_id_field_name = 'user_id'
+app_versions_table = 'builds'
+app_versions_field_name = 'version_code'
 submittal_confirmation_channel = discord.Object(id=1374477393800073337)
 feature_request_channel = discord.Object(id=1374432042988732578)
 version_tracker_channel = discord.Object(id=1384565719953571892)

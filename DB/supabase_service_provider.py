@@ -4,9 +4,7 @@ from dotenv import load_dotenv
 from supabase._async.client import AsyncClient as Client, create_client
 
 from DB.database_service_provider import DBServiceProvider
-from constants import bug_users_table, message_id_field_name, user_id_field_name, feature_users_table, id_field_name, \
-    bug_report_id_field_name, feature_request_id_field_name, bug_reports_table, feature_requests_table, \
-    closed_alpha_field_name
+from constants import *
 from models.submittal_object import SubmittalObject
 
 load_dotenv()
@@ -16,11 +14,15 @@ class SupabaseServiceProvider(DBServiceProvider):
     def __init__(self, db_path=None):
         super().__init__(db_path)
         self.client: Client | None = None
+        self.app_client: Client | None = None
 
     async def initialize(self):
         url = os.getenv('SUPABASE_URL')
         key = os.getenv('SUPABASE_KEY')
-        self.client: Client = await create_client(url, key)
+        app_url = os.getenv('APP_SUPABASE_URL')
+        app_key = os.getenv('APP_SUPABASE_KEY')
+        self.app_client = await create_client(app_url, app_key)
+        self.client = await create_client(url, key)
 
     async def add_bug_user(self, report_id, user_id):
         data = {
@@ -81,3 +83,11 @@ class SupabaseServiceProvider(DBServiceProvider):
     async def get_feature_request(self, report_id):
         response = await self.client.from_(feature_requests_table).select().eq(id_field_name, report_id).execute()
         return SubmittalObject.from_dict(response.data[0]) if response.data else None
+    
+    async def add_version_to_app_db(self, version):
+        data = {
+            app_versions_field_name: version
+        }
+        await self.app_client.from_(app_versions_table).insert(data).execute()
+
+

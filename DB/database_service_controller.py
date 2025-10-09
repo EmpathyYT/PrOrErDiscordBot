@@ -40,3 +40,6 @@ class DBServiceController(DBServiceProvider):
 
     async def get_feature_request(self, report_id) -> SubmittalObject | None:
         return await self.provider.get_feature_request(report_id)
+    
+    async def add_version_to_app_db(self, version):
+        await self.provider.add_version_to_app_db(version)

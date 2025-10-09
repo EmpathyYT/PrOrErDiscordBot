@@ -210,6 +210,14 @@ class AppCommands(commands.Cog):
         await message.edit(embed=embed, view=None)
         await interaction.response.send_message("Feature request updated!", ephemeral=True)
 
+    
+    @discord.app_commands.checks.has_role(app_dev_role.id)
+    @discord.app_commands.describe(report_id='This pushes a new version to the app versions database')
+    async def push_version(self, interaction: discord.Interaction, report_id: str):
+        version = report_id
+        await PrOrErClient.provider.add_version_to_app_db(version)
+        await interaction.response.send_message(f"Version {version} added to the database!", ephemeral=True)
+    
     async def get_report_title_and_link(self, is_bug: bool, message_id: int) -> Tuple[str, str, Message]:
         embed_to_extract_from: discord.Embed
         original_message: discord.Message
@@ -249,6 +257,8 @@ class AppCommands(commands.Cog):
                 return True, (to_do_message, to_do_spliced_messages, message_list, original_message)
 
         return False, (to_do_message, to_do_spliced_messages)
+
+
 
 
 async def setup(bot):

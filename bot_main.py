@@ -103,5 +103,10 @@ class PrOrErClient(commands.Bot):
 
         await channel.send(f'<@&{app_tester_role.id if not is_closed else closed_tester_role.id}> ', embed=embed,
                            view=GithubReleaseDownload(link=download))
+        
+        await PrOrErClient.provider.add_version_to_app_db(release_tag)
+
         if not is_closed:
             await version_tracker.edit(name=f'Latest Version: {release_tag}')
+        
+        

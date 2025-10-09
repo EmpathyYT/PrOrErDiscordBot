@@ -35,3 +35,6 @@ class DBServiceProvider:
     async def get_feature_request(self, report_id):
         pass
 
+    async def add_version_to_app_db(self, version):
+        pass
+
