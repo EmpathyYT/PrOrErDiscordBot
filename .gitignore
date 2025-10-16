@@ -3,3 +3,4 @@
 /.fleet/run.json
 .venv
 *.pyc
+/.vscode

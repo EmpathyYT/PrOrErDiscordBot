@@ -35,6 +35,12 @@ class AppCommands(commands.Cog):
     def __init__(self, bot):
         self.bot: PrOrErClient = bot
 
+    @commands.command()
+    @commands.is_owner()
+    async def sync(self, ctx):
+        await ctx.send("Syncing...")
+        await self.bot.tree.sync()
+
     @discord.app_commands.command(name='ping', description='Ping Pong!')
     async def ping(self, interaction: discord.Interaction):
         await interaction.response.send_message('Pong!')
@@ -212,30 +218,26 @@ class AppCommands(commands.Cog):
 
     
     @discord.app_commands.checks.has_role(app_dev_role.id)
-    @discord.app_commands.describe(report_id='This pushes a new version to the app versions database')
-    async def push_version(self, interaction: discord.Interaction, report_id: str):
-        version = report_id
+    @discord.app_commands.command(name='push_version', description='This is for pushing a new version to the app versions database')
+    async def push_version(self, interaction: discord.Interaction, version: str):
         await PrOrErClient.provider.add_version_to_app_db(version)
         await interaction.response.send_message(f"Version {version} added to the database!", ephemeral=True)
     
     @discord.app_commands.checks.has_role(app_dev_role.id)
-    @discord.app_commands.describe(report_id='This disallows all versions except the one provided')
-    async def outdate_all_versions(self, interaction: discord.Interaction, report_id: str):
-        version = report_id
+    @discord.app_commands.command(name='outdate_all_versions', description='This is for outdating all previous versions except the one provided')
+    async def outdate_all_versions(self, interaction: discord.Interaction, version: str):
         await PrOrErClient.provider.outdate_previous_versions(version)
         await interaction.response.send_message(f"All versions except {version} have been disallowed.", ephemeral=True)
 
     @discord.app_commands.checks.has_role(app_dev_role.id)
-    @discord.app_commands.describe(report_id='This disallows a specific version')
-    async def outdate_version(self, interaction: discord.Interaction, report_id: str):
-        version = report_id
+    @discord.app_commands.command(name='outdate_version', description='This is for outdating a specific version')
+    async def outdate_version(self, interaction: discord.Interaction, version: str):
         await PrOrErClient.provider.outdate_version(version)
         await interaction.response.send_message(f"Version {version} has been disallowed.", ephemeral=True)
 
     @discord.app_commands.checks.has_role(app_dev_role.id)
-    @discord.app_commands.describe(report_id='This allows a specific version')
-    async def allow_version(self, interaction: discord.Interaction, report_id: str):
-        version = report_id
+    @discord.app_commands.command(name='allow_version', description='This is for allowing a specific version')
+    async def allow_version(self, interaction: discord.Interaction, version: str):
         await PrOrErClient.provider.allow_version(version)
         await interaction.response.send_message(f"Version {version} has been allowed.", ephemeral=True)
 

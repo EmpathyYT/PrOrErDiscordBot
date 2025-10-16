@@ -60,7 +60,7 @@ async def logs():
 async def main():
     await asyncio.gather(
         run_bot(),
-        app.run_task(host="0.0.0.0", port=port)
+        app.run_task(port=port) # return host to 0.0.0.0
     )
 
 if __name__ == "__main__":
